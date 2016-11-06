@@ -7,7 +7,7 @@ MapGenerator = {
 	    for (var i = 0; i < size; i++) {
     		var row = [];
 	    	for (var j = 0; j < size; j++){
-	    		var n = (noise.perlin2(i/30, j/30) + 1)/2;
+	    		var n = (noise.perlin2(i/50, j/50) + 1)/2;
 
     		    var data;
     		    if (n < 0.3) {
