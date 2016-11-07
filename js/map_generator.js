@@ -2,7 +2,6 @@ MapGenerator = {
 	generateData: function(size) {
 		var map = [];
 	    noise.seed(Math.random());
-	    // noise.seed(3)
 
 	    for (var i = 0; i < size; i++) {
     		var row = [];
@@ -137,7 +136,8 @@ MapGenerator = {
 		var data = "";
 		for (var y = 0; y < size; y++){
 			for (var x = 0; x < size; x++){
-				data += this._getTileFromData(mapData[y][x], mapData, y, x).toString();
+				var tile = this._getTileFromData(mapData[y][x], mapData, y, x);
+				data += tile.toString();
 				if (x < size) data += ',';
 			}
 			if (y < size) data += "\n";

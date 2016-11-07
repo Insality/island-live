@@ -2,4 +2,12 @@ Config = {
 	MAP_SIZE: 256, // 256
 	GAME_TITLE: "Island paradise",
 	TILE_SIZE: 8,
+
+	TILE_DEEP: 0,
+	TILE_WATER: 1,
+	TILE_SAND: 2,
+	TILE_DIRT: 3,
+	TILE_GRASS: 4,
+	TILE_FOREST: 5,
+	TILE_ROCK: 6,
 }
