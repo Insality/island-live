@@ -8,7 +8,7 @@ Utils = {
 
 		game.scale.pageAlignVertically = true;
 	    game.scale.pageAlignHorizontally = true;
-	    // game.scale.setShowAll();
+	    game.scale.setShowAll();
 	    // game.scale.refresh();
 	},
 

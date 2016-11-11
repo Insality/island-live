@@ -23,23 +23,45 @@
         music = game.add.audio('music_game');
 	    music.play('', 0, 1, true);
 
-	    
 		game.groundLayer = game.add.group();
 	    game.entities = game.add.group();
 
+	    game.player = Man.addMan(3, 4, 0);
+	    game.player.x = 100;
+	    game.player.y = 100;
+	    game.entities.add(game.player);
+
+	    game.enemy = Man.addMan(2, 5, 0);
+	    game.enemy.x = 40;
+	    game.enemy.y = 40;
+	    game.entities.add(game.enemy);
+
+	    for (var i = 0; i < 100; i++) {
+	    	game.enemy = Man.addMan(game.rnd.integerInRange(0, 3), game.rnd.integerInRange(0, 9), 0);
+		    game.enemy.x = game.rnd.integerInRange(40, 1000);
+		    game.enemy.y = game.rnd.integerInRange(40, 1000);
+		    game.entities.add(game.enemy);
+	    }
+
+	    game.camera.follow(game.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
 		for (var i = 0; i < 500; i++) {
 			var pos = {x: game.rnd.integerInRange(0, Config.MAP_SIZE * Config.TILE_SIZE), y: game.rnd.integerInRange(0, Config.MAP_SIZE * Config.TILE_SIZE)};
 			var tile = Math.floor(game.map.map.getTile(Math.floor(pos.x/Config.TILE_SIZE), Math.floor(pos.y/Config.TILE_SIZE)).index/16);
 			var tileN = game.rnd.integerInRange(0, 3) + (tile*8);
 			var misc = game.groundLayer.create(pos.x, pos.y, "misc", tileN);
-		}
+			misc.anchor.set(0.5, 1);
+			if (game.rnd.frac() > 0.5) { 
+				misc.scale.set(-1, 1);
+			}
 
-	    game.player = Man.addMan();
-	    game.enemy = Man.addMan();
-	    game.enemy.x = 40;
-	    game.enemy.y = 40;
-	    game.camera.follow(game.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
+			if (game.rnd.frac() < 0.8) {
+				// console.log(misc);
+				misc.smoothed = false;
+				var tween = game.add.tween(misc.scale).to( {y: 0.8}, game.rnd.integerInRange(3000, 8000), Phaser.Easing.Sinusoidal.Out, true, game.rnd.integerInRange(0, 3000), true);
+				tween.repeat(-1);
+			}
+		}
 	}
 
 	function update() {
@@ -71,7 +93,7 @@
 	    if (nextTile == Config.TILE_DEEP) {
 	    	delta.x = 0;
 	    	delta.y = 0;
-	    	game.player.animations.stop();
+	    	game.player.playAnim("stop");
 	    }
 
 	    game.player.x += delta.x;
@@ -82,17 +104,15 @@
 
 	    if (delta.x != 0 || delta.y != 0) {
 		    if (game.player.prevTile != currentTile && (game.player.prevTile == Config.TILE_WATER || currentTile == Config.TILE_WATER)) {
-		    	game.player.animations.stop();
+		    	game.player.playAnim("stop");
 		    }
-	    	game.player.animations.play("walk", 7*speed, true);
+	    	game.player.playAnim("walk", 7*speed);
 	    } else {
-	    	game.player.animations.play("stay", 6, true);
+	    	game.player.playAnim("stay", 6);
 	    }
 
 
 	    game.player.prevTile = currentTile;
 	    game.entities.sort('y', Phaser.Group.SORT_ASCENDING);
 	}
-
-
 };
