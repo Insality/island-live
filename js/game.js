@@ -5,10 +5,12 @@
 
 	function preload () {
 		Preloader.loadImages(game);
+		game.time.advancedTiming = true;
 	}
 
 	function create () {
 		game.stage.backgroundColor = '#456A72';
+		game.stage.smoothed = false;
 		Utils.make_pixelart(game, 4);
 
 	    var mapData = MapGenerator.generateData(Config.MAP_SIZE);
@@ -26,21 +28,26 @@
 		game.groundLayer = game.add.group();
 	    game.entities = game.add.group();
 
-	    game.player = Man.addMan(3, 4, 0);
+	    game.player = Man.addMan(3, 4, 1);
 	    game.player.x = 100;
 	    game.player.y = 100;
+	    game.player.isPlayer = true;
 	    game.entities.add(game.player);
 
-	    game.enemy = Man.addMan(2, 5, 0);
-	    game.enemy.x = 40;
-	    game.enemy.y = 40;
-	    game.entities.add(game.enemy);
+	    game.enemies = [];
 
-	    for (var i = 0; i < 100; i++) {
-	    	game.enemy = Man.addMan(game.rnd.integerInRange(0, 3), game.rnd.integerInRange(0, 9), 0);
-		    game.enemy.x = game.rnd.integerInRange(40, 1000);
-		    game.enemy.y = game.rnd.integerInRange(40, 1000);
+	    game.enemy = Man.addMan(2, 5);
+	    game.enemy.x = 300;
+	    game.enemy.y = 300;
+	    game.entities.add(game.enemy);
+	    game.enemies.push(game.enemy);
+
+	    for (var i = 0; i < Friends.count; i++) {
+	    	game.enemy = Man.addMan(undefined, undefined, undefined, Friends.items[i]);
+		    game.enemy.x = game.rnd.integerInRange(40, 2000);
+		    game.enemy.y = game.rnd.integerInRange(40, 2000);
 		    game.entities.add(game.enemy);
+		    game.enemies.push(game.enemy);
 	    }
 
 	    game.camera.follow(game.player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
@@ -64,16 +71,10 @@
 		}
 	}
 
-	function update() {
+	function update(a) {
+		game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");   
 		var delta = {x: 0, y: 0}
-		var currentTile = Math.floor(game.map.map.getTile(Math.floor(game.player.x/Config.TILE_SIZE), Math.floor(game.player.y/Config.TILE_SIZE)).index/16);
-		game.player.currentTile = currentTile;
-		if (!game.player.prevTile) game.player.prevTile = currentTile;
 		var speed = 1;
-
-		if (currentTile == Config.TILE_WATER) {
-			speed = 0.5;
-		}
 
 		if (cursors.left.isDown || pad.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
 	        delta.x -= speed;
@@ -86,33 +87,33 @@
 	        delta.y -= speed;
 	    }
 	    else if (cursors.down.isDown || pad.isDown(Phaser.Gamepad.XBOX360_DPAD_DOWN) || pad.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_Y) > 0.1) {
-	        delta.y = speed;
+	        delta.y += speed;
 	    }
 
-	    var nextTile = Math.floor(game.map.map.getTile(Math.floor((game.player.x+delta.x)/Config.TILE_SIZE), Math.floor((game.player.y+delta.y)/Config.TILE_SIZE)).index/16)
-	    if (nextTile == Config.TILE_DEEP) {
-	    	delta.x = 0;
-	    	delta.y = 0;
-	    	game.player.playAnim("stop");
-	    }
+	    game.player.move(delta, speed);
 
-	    game.player.x += delta.x;
-	    game.player.y += delta.y;
-	    if (delta.x > 0) game.player.scale.x = -1;
-	    if (delta.x < 0) game.player.scale.x = 1;
-
-
-	    if (delta.x != 0 || delta.y != 0) {
-		    if (game.player.prevTile != currentTile && (game.player.prevTile == Config.TILE_WATER || currentTile == Config.TILE_WATER)) {
-		    	game.player.playAnim("stop");
-		    }
-	    	game.player.playAnim("walk", 7*speed);
-	    } else {
-	    	game.player.playAnim("stay", 6);
-	    }
-
-
-	    game.player.prevTile = currentTile;
+	    // for (var i in game.enemies) {
+	    // 	game.enemies[i].move({x: 1, y: 0});
+	    // }`
+	    
 	    game.entities.sort('y', Phaser.Group.SORT_ASCENDING);
+
+	    var nearestMan;
+	    game.entities.forEach(function(item) {
+	    	if (item.distToPlayer > 0 && item.distToPlayer < 50) {
+	    		if (game.target) {
+	    			if (item.distToPlayer < game.target.distToPlayer) {
+	    				game.target.children[0].tint = 0xffffff;
+	    				game.target = item;
+	    				game.target.children[0].tint = 0xffaaaa;
+	    			}
+	    		} else {
+	    			game.target = item;
+    				game.target.children[0].tint = 0xffaaaa;
+	    		}
+	    	}
+	    });
+
+
 	}
 };

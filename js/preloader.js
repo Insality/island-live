@@ -10,6 +10,8 @@ Preloader = {
 		game.load.spritesheet('particles', 'img/particles.png', 4, 4);
 		game.load.spritesheet('misc', 'img/misc.png', 8, 8);
 
+		game.load.bitmapFont('pixelFont', 'fonts/font.png', 'fonts/font.fnt');
+
 		game.load.audio('step1', 'sounds/step1.wav');
 		game.load.audio('step2', 'sounds/step2.wav');
 		game.load.audio('step3', 'sounds/step3.wav');
