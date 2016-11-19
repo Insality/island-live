@@ -69,6 +69,18 @@
 				tween.repeat(-1);
 			}
 		}
+
+		// Post effects
+		var vignette = game.add.filter('Vignette');
+
+	    vignette.size = 0.2;
+	    vignette.amount = 0.5;
+	    vignette.alpha = 1;
+
+	    var crt = game.add.filter("CRT");
+
+
+	    game.stage.filters = [vignette, crt];
 	}
 
 	function update(a) {
@@ -103,16 +115,21 @@
 	    	if (item.distToPlayer > 0 && item.distToPlayer < 50) {
 	    		if (game.target) {
 	    			if (item.distToPlayer < game.target.distToPlayer) {
-	    				game.target.children[0].tint = 0xffffff;
+	    				game.target.setTint(0xFFFFFF)
 	    				game.target = item;
-	    				game.target.children[0].tint = 0xffaaaa;
+	    				game.target.setTint(0xFFAAAA)
 	    			}
 	    		} else {
 	    			game.target = item;
-    				game.target.children[0].tint = 0xffaaaa;
+	    			game.target.setTint(0xffaaaa)
 	    		}
 	    	}
 	    });
+
+	    if (game.target && game.target.distToPlayer > 50) {
+	    	game.target.setTint(0xffffff);
+	    	game.target = null;
+	    }
 
 
 	}

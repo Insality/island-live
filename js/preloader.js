@@ -19,5 +19,8 @@ Preloader = {
 		game.load.audio('step_water2', 'sounds/step_water2.wav');
 
 		game.load.audio('music_game', 'musics/music_game.mp3');
+
+		game.load.script('filter-vignette', 'js/shaders/vignette.js');
+		game.load.script('filter-crt', 'js/shaders/crt.js');
 	},
 }

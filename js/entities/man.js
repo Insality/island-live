@@ -1,6 +1,6 @@
 var Man = {
 	addMan: function(body, head, leg, data) {
-		var bodyRow = body || game.rnd.integerInRange(5, 5);
+		var bodyRow = body || game.rnd.integerInRange(0, 9);
 		var headRow = head || game.rnd.integerInRange(0, 13);
 		var legRow = leg || game.rnd.integerInRange(0, 3);
 
@@ -12,6 +12,7 @@ var Man = {
 		var legFrame = 0;
 
 		var man = game.add.group();
+		// console.log(man);
 		var head = game.entities.create(64, 64, 'heads');
 		head.smoothed = false;
 		var leg = game.entities.create(64, 64, 'legs');
@@ -26,10 +27,10 @@ var Man = {
 		body.position = new PIXI.Point(0, 0);
 
 		if (data) { 
-	 		text = game.add.bitmapText(0, -10, 'pixelFont', data.first_name + " " + data.last_name, 8);
-	 		text.anchor.set(0.5, 1);
-			man.add(text);
-			man.nameText = text;
+	 		// text = game.add.bitmapText(0, -10, 'pixelFont', data.first_name + " " + data.last_name, 8);
+	 		// text.anchor.set(0.5, 1);
+			// man.add(text);
+			// man.nameText = text;
 		}
 
 
@@ -49,9 +50,12 @@ var Man = {
 		man.step_water2 = game.add.audio('step_water2');
 
 		walkAnimBody.enableUpdate = true;
-		walkAnimBody.onStart.add(function() {bodyFrame = 0;});
+		walkAnimBody.onStart.add(function(e, a, b) {
+			head.position.y = (a.currentFrame.index % 3 == 0 ? -1 : 0);
+		});
 		walkAnimBody.onUpdate.add(function(e, a, b) {
-			bodyFrame = (bodyFrame + 1) % bodyWidth;
+			head.position.y = (a.index % 3 == 0 ? -1 : 0);
+			
 			if (man.visible) {
 				if (man.currentTile != Config.TILE_WATER) {
 					Particles.addStepParticle({x: man.x, y: man.y+8})
@@ -63,38 +67,17 @@ var Man = {
 			}
 		}, this);
 
+		stayAnimBody.enableUpdate = true;
+		stayAnimBody.onStart.add(_.bind(function(e, a) {
+			// if (this.isPlayer) 
 
-		walkAnimHead.enableUpdate = true;
-		walkAnimHead.onStart.add(function() {
-			headFrame = 0;
-			head.position.y = -1;
-		});
-		walkAnimHead.onUpdate.add(function(a, b) {
-			headFrame = (headFrame + 1) % 3;
-			var isHeadTop = false;
-			if (headFrame == 0 || headFrame == 1){
-				isHeadTop = true;
-			};
-
-			head.position.y = isHeadTop ? -1 : 0;
-
+				// console.log(a.index);
+			head.position.y = (a.currentFrame.index % 3 == 0 ? -1 : 0);
+		}, this));
+		stayAnimBody.onUpdate.add(function(e, a, b) {
+			head.position.y = (a.index % 3 == 0 ? -1 : 0);			
 		});
 
-		stayAnimHead.enableUpdate = true;
-		stayAnimHead.onStart.add(function() {
-			headFrame = 0;
-			head.position.y = -1;
-		});
-		stayAnimHead.onUpdate.add(function(a, b) {
-			headFrame = (headFrame + 1) % 4;
-
-			var isHeadTop = false;
-			if (headFrame == 0){
-				isHeadTop = true;
-			};
-			head.position.y = isHeadTop ? -1 : 0;
-
-		});
 
     	head.anchor.setTo(0.5, 0.5);
     	leg.anchor.setTo(0.5, 0.5);
@@ -191,6 +174,12 @@ var Man = {
     			}
     		}
     	};
+
+    	man.setTint = function(color) {
+    		leg.tint = color;
+    		head.tint = color;
+    		body.tint = color;
+    	}
 
 		man.playAnim("stay", 6);
     	return man;
